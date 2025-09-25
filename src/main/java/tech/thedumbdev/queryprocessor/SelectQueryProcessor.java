@@ -10,5 +10,7 @@ public class SelectQueryProcessor implements QueryProcessor {
     }
 
     @Override
-    public void process(String query, Object source) {}
+    public void process(String query, Object source) {
+
+    }
 }

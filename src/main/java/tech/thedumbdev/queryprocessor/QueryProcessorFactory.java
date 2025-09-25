@@ -20,6 +20,6 @@ public class QueryProcessorFactory {
             throw new IllegalArgumentException("Unknown query: " + parts[0]);
         }
 
-        return processors.get(parts[0]);
+        return processors.get(parts[0]); // Returns the instance of SelectQueryProcessor or FindQueryProcessor
     }
 }

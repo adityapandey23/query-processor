@@ -1,16 +1,12 @@
 package tech.thedumbdev;
 // /home/aditya/Documents/Coding/projects/logging-notification-system/logging-system/logs/
+// mvn clean compile exec:java
 import tech.thedumbdev.queryprocessor.QueryProcessor;
 import tech.thedumbdev.queryprocessor.QueryProcessorFactory;
-import tech.thedumbdev.reader.ElasticReader;
-import tech.thedumbdev.reader.FileReader;
 import tech.thedumbdev.reader.Reader;
+import tech.thedumbdev.reader.ReaderFactory;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class App {
     public static void main(String[] args) {
@@ -28,37 +24,47 @@ public class App {
 
         List<String> path = switch (source) {
             case "elasticsearch" -> {
-                System.out.println("Enter the host URL: "); // TODO: CHECKS
+                System.out.println("Enter the host URL: "); // TODO: Perform Check
                 String host = sc.nextLine();
                 System.out.println("Enter the API key: ");
                 String apiKey = sc.nextLine();
                 yield new ArrayList<>(Arrays.asList(host, apiKey));
             }
             case "file" -> {
-                System.out.println("Enter the path to the file: "); // TODO: CHECKS
+                System.out.println("Enter the path to the file: "); // TODO: Perform Check
                 String file = sc.nextLine();
-                yield new ArrayList<>(Arrays.asList(file));
+                yield new ArrayList<>(Collections.singletonList(file));
             }
             default ->
                     throw new IllegalArgumentException("Invalid source type\nThe source could be either elasticsearch or file");
         };
 
-        Reader reader = (source.equals("elasticsearch")) ? new ElasticReader(path.get(0), path.get(1)) : new FileReader(path.get(0));
+        Reader reader = new ReaderFactory(path).getReader();
 
         System.out.println("(Press ? for help)");
 
         QueryProcessorFactory factory = new QueryProcessorFactory(reader);
 
-        while(true){
+        boolean shouldStop = false;
+        while(!shouldStop){
             System.out.print("Enter your query: ");
             String query = sc.nextLine();
             query = query.toLowerCase();
-            try {
-                QueryProcessor queryProcessor = factory.getQueryProcessor(query);
-                boolean shouldStop = queryHandler(query);
-                if(shouldStop) break;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            switch (query) {
+                case "?":
+                    System.out.println("You can select a ranged query, like SELECT .. FROM ..");
+                    System.out.println("You can select a find query like FIND .. FROM ..");
+                    break;
+                case "exit":
+                    shouldStop = true;
+                    break;
+                default:
+                    try {
+                        QueryProcessor queryProcessor = factory.getQueryProcessor(query);
+                        queryHandler(query, queryProcessor);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
             }
         }
 
@@ -70,21 +76,6 @@ public class App {
         System.out.println("╚═════╝    ╚═╝   ╚══════╝");
     }
 
-    public static boolean queryHandler(String query) {
-        switch (query) {
-            case "?":
-                System.out.println("You can select a ranged query, like SELECT .. FROM ..");
-                System.out.println("You can select a find query like FIND .. FROM ..");
-                break;
-            case "exit":
-                return true;
-            default:
-                try {
-                    System.out.println();
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(e);
-                }
-        }
-        return false;
+    public static void queryHandler(String query, QueryProcessor queryProcessor) {
     }
 }
