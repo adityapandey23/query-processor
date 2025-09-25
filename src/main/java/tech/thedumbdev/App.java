@@ -5,6 +5,8 @@ import tech.thedumbdev.queryprocessor.QueryProcessor;
 import tech.thedumbdev.queryprocessor.QueryProcessorFactory;
 import tech.thedumbdev.reader.Reader;
 import tech.thedumbdev.reader.ReaderFactory;
+import tech.thedumbdev.util.ElasticPathCheck;
+import tech.thedumbdev.util.FilePathCheck;
 
 import java.util.*;
 
@@ -24,15 +26,21 @@ public class App {
 
         List<String> path = switch (source) {
             case "elasticsearch" -> {
-                System.out.println("Enter the host URL: "); // TODO: Perform Check
+                System.out.println("Enter the host URL: ");
                 String host = sc.nextLine();
                 System.out.println("Enter the API key: ");
                 String apiKey = sc.nextLine();
+                if(!ElasticPathCheck.vaildConnectionString(host) || !ElasticPathCheck.validAPIKey(apiKey)) {
+                    throw new IllegalArgumentException("Invalid host url or API key");
+                }
                 yield new ArrayList<>(Arrays.asList(host, apiKey));
             }
             case "file" -> {
-                System.out.println("Enter the path to the file: "); // TODO: Perform Check
+                System.out.println("Enter the path to the file: ");
                 String file = sc.nextLine();
+                if(!FilePathCheck.vaildFilePath(file)) {
+                    throw new IllegalArgumentException("Invalid path to the file");
+                }
                 yield new ArrayList<>(Collections.singletonList(file));
             }
             default ->
