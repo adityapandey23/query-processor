@@ -1,7 +1,16 @@
 package tech.thedumbdev;
 // /home/aditya/Documents/Coding/projects/logging-notification-system/logging-system/logs/
 // mvn clean compile exec:java
-import tech.thedumbdev.queryprocessor.QueryProcessor;
+
+// For the generation
+// /home/aditya/Documents/Coding/projects/logging-notification-system/query-processor/src/main/java
+// tech.thedumbdev.gen
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
+import tech.thedumbdev.ast.ASTQuery;
+import tech.thedumbdev.gen.QueryLexer;
+import tech.thedumbdev.gen.QueryParser;
+import tech.thedumbdev.parser.ASTBuilder;
 import tech.thedumbdev.queryprocessor.QueryProcessorFactory;
 import tech.thedumbdev.reader.Reader;
 import tech.thedumbdev.reader.ReaderFactory;
@@ -57,19 +66,29 @@ public class App {
         while(!shouldStop){
             System.out.print("Enter your query: ");
             String query = sc.nextLine();
-            query = query.toLowerCase();
             switch (query) {
                 case "?":
                     System.out.println("You can select a ranged query, like SELECT .. FROM ..");
-                    System.out.println("You can select a find query like FIND .. FROM ..");
+                    System.out.println("You can select a find query like FIND .. IN ..");
                     break;
-                case "exit":
+                case "exit": // THIS FKING THING IS CASE SENSITIVEEEEE
                     shouldStop = true;
                     break;
                 default:
                     try {
-                        QueryProcessor queryProcessor = factory.getQueryProcessor(query);
-                        queryHandler(query, queryProcessor);
+                        String[] testQueries = {
+                                "SELECT name FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
+                                "SELECT name, email FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
+                                "FIND name IN 1234567890.log;",
+                                "FIND name, email IN 1234567890.log;",
+                        };
+
+                        for (String testQuery : testQueries) {
+                            System.out.println("Query: " + testQuery);
+                            System.out.println("Tree: " + treeGenerator(testQuery));
+                            System.out.println("Done!!!");
+                        }
+//                        QueryProcessor queryProcessor = factory.getQueryProcessor(query.toLowerCase());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -84,6 +103,35 @@ public class App {
         System.out.println("╚═════╝    ╚═╝   ╚══════╝");
     }
 
-    public static void queryHandler(String query, QueryProcessor queryProcessor) {
+    public static ASTQuery treeGenerator(String query) {
+        try {
+            CharStream charStream = CharStreams.fromString(query);
+
+            QueryLexer lexer = new QueryLexer(charStream);
+            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            QueryParser parser = new QueryParser(tokenStream);
+
+            parser.removeErrorListeners();
+            parser.addErrorListener(new BaseErrorListener() {
+                @Override
+                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                    throw new RuntimeException("Parse error at " + line + ":" + charPositionInLine + " - " + msg);
+                }
+            });
+
+            ParseTree tree = parser.query();
+
+            if(parser.getNumberOfSyntaxErrors() > 0) {
+                throw new RuntimeException("Syntax errors found");
+            }
+
+            System.out.println("Parse tree: " + tree.toStringTree(parser));
+
+            ASTBuilder visitor = new  ASTBuilder();
+            return visitor.visit(tree);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
