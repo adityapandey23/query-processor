@@ -11,6 +11,7 @@ import tech.thedumbdev.ast.ASTQuery;
 import tech.thedumbdev.gen.QueryLexer;
 import tech.thedumbdev.gen.QueryParser;
 import tech.thedumbdev.parser.ASTBuilder;
+import tech.thedumbdev.queryprocessor.QueryProcessor;
 import tech.thedumbdev.queryprocessor.QueryProcessorFactory;
 import tech.thedumbdev.reader.Reader;
 import tech.thedumbdev.reader.ReaderFactory;
@@ -76,19 +77,23 @@ public class App {
                     break;
                 default:
                     try {
-                        String[] testQueries = {
-                                "SELECT name FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
-                                "SELECT name, email FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
-                                "FIND name IN 1234567890.log;",
-                                "FIND name, email IN 1234567890.log;",
-                        };
+//                        String[] testQueries = {
+//                                "SELECT name FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
+//                                "SELECT name, email FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
+//                                "FIND name IN 1234567890.log;",
+//                                "FIND name, email IN 1234567890.log;",
+//                        };
 
-                        for (String testQuery : testQueries) {
-                            System.out.println("Query: " + testQuery);
-                            System.out.println("Tree: " + treeGenerator(testQuery));
-                            System.out.println("Done!!!");
-                        }
-//                        QueryProcessor queryProcessor = factory.getQueryProcessor(query.toLowerCase());
+//                        for (String testQuery : testQueries) {
+//                            System.out.println("Query: " + testQuery);
+//                            System.out.println("Tree: " + treeGenerator(testQuery));
+//                            System.out.println("Done!!!");
+//                        }
+
+                        ParseTree tree = treeGenerator(query);
+                        ASTBuilder visitor = new ASTBuilder();
+                        ASTQuery astQuery = visitor.visit(tree);
+                        QueryProcessor queryProcessor = factory.getQueryProcessor(astQuery);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -103,7 +108,7 @@ public class App {
         System.out.println("╚═════╝    ╚═╝   ╚══════╝");
     }
 
-    public static ASTQuery treeGenerator(String query) {
+    public static ParseTree treeGenerator(String query) {
         try {
             CharStream charStream = CharStreams.fromString(query);
 
@@ -126,9 +131,7 @@ public class App {
             }
 
             System.out.println("Parse tree: " + tree.toStringTree(parser));
-
-            ASTBuilder visitor = new  ASTBuilder();
-            return visitor.visit(tree);
+            return tree;
 
         } catch (Exception e) {
             throw new RuntimeException(e);

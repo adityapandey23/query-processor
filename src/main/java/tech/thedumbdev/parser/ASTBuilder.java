@@ -12,6 +12,16 @@ import java.util.List;
 
 public class ASTBuilder extends QueryBaseVisitor<ASTQuery> {
     @Override
+    public ASTQuery visitQuery(QueryParser.QueryContext ctx) {
+        if (ctx.selectStatement() != null) {
+            return visit(ctx.selectStatement());
+        } else if (ctx.findStatement() != null) {
+            return visit(ctx.findStatement());
+        }
+        return null;
+    }
+
+    @Override
     public ASTQuery visitSelectStatement(QueryParser.SelectStatementContext ctx) {
         List<String> selectedColumns = new ArrayList<>();
         for(TerminalNode selectedColumn : ctx.selectList().IDENTIFIER()) {
