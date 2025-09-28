@@ -11,7 +11,7 @@ public class ReaderFactory {
             this.reader = new ElasticReader(path.get(0), path.get(1));
         }
         else {
-            this.reader = new FileReader(path.get(0));
+            this.reader = new FileReader();
         }
     }
 

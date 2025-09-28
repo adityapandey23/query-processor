@@ -16,7 +16,6 @@ import tech.thedumbdev.queryprocessor.QueryProcessorFactory;
 import tech.thedumbdev.reader.Reader;
 import tech.thedumbdev.reader.ReaderFactory;
 import tech.thedumbdev.util.ElasticPathCheck;
-import tech.thedumbdev.util.FilePathCheck;
 
 import java.util.*;
 
@@ -40,18 +39,13 @@ public class App {
                 String host = sc.nextLine();
                 System.out.println("Enter the API key: ");
                 String apiKey = sc.nextLine();
-                if(!ElasticPathCheck.vaildConnectionString(host) || !ElasticPathCheck.validAPIKey(apiKey)) {
+                if(!ElasticPathCheck.validConnectionString(host) || !ElasticPathCheck.validAPIKey(apiKey)) {
                     throw new IllegalArgumentException("Invalid host url or API key");
                 }
                 yield new ArrayList<>(Arrays.asList(host, apiKey));
             }
             case "file" -> {
-                System.out.println("Enter the path to the file: ");
-                String file = sc.nextLine();
-                if(!FilePathCheck.vaildFilePath(file)) {
-                    throw new IllegalArgumentException("Invalid path to the file");
-                }
-                yield new ArrayList<>(Collections.singletonList(file));
+                yield new ArrayList<>();
             }
             default ->
                     throw new IllegalArgumentException("Invalid source type\nThe source could be either elasticsearch or file");
@@ -94,6 +88,9 @@ public class App {
                         ASTBuilder visitor = new ASTBuilder();
                         ASTQuery astQuery = visitor.visit(tree);
                         QueryProcessor queryProcessor = factory.getQueryProcessor(astQuery);
+                        if (queryProcessor == null) throw new IllegalArgumentException("Invalid query");
+
+                        queryProcessor.process(astQuery);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

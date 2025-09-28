@@ -19,16 +19,11 @@ public class QueryProcessorFactory {
 
     public QueryProcessor getQueryProcessor(ASTQuery queryTree) throws Exception {
         if(queryTree instanceof SelectBetween) {
-            System.out.println("SELECT hai");
             return processors.get("select");
         }
         else if(queryTree instanceof FindIn){
-            System.out.println("FIND hai");
             return processors.get("find");
         }
-        else {
-            System.out.println("Kuch nahi hai");
-            return null;
-        }
+        return null; // This won't happen but still
     }
 }

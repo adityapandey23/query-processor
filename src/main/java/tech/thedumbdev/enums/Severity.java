@@ -1,4 +1,4 @@
-package tech.thedumbdev.entity;
+package tech.thedumbdev.enums;
 
 public enum Severity {
     UNDEFINED("undefined"),

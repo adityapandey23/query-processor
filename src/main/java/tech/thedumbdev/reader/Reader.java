@@ -1,9 +1,10 @@
 package tech.thedumbdev.reader;
 
-import tech.thedumbdev.entity.Log;
+import tech.thedumbdev.pojo.Log;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface Reader {
-    public Collection<Log> read(Object source); // Object -> file path or DB url
+    // This is supposed to pull everything and the just upper layer would act as a filter
+    public List<Log> read(String logFile);
 }

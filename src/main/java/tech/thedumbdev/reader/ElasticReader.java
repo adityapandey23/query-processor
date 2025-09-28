@@ -1,10 +1,10 @@
 package tech.thedumbdev.reader;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import tech.thedumbdev.entity.Log;
+import tech.thedumbdev.pojo.Log;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class ElasticReader implements Reader{
     ElasticsearchClient client;
@@ -14,7 +14,7 @@ public class ElasticReader implements Reader{
     }
 
     @Override
-    public Collection<Log> read(Object source) {
+    public List<Log> read(String logFile) {
         return new ArrayList<>();
     }
 }
