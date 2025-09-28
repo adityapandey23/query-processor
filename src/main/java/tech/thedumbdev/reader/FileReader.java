@@ -42,14 +42,9 @@ public class FileReader implements Reader{
                     break;
                 }
             }
-
-        }
-
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-
-        finally {
+        } finally {
             try {
                 if (ois != null) {
                     ois.close();
@@ -57,13 +52,11 @@ public class FileReader implements Reader{
                 if (fis != null) {
                     fis.close();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 //noinspection ThrowFromFinallyBlock
                 throw new RuntimeException(e);
             }
         }
-
         return logs;
     }
 }
