@@ -15,7 +15,6 @@ import tech.thedumbdev.queryprocessor.QueryProcessor;
 import tech.thedumbdev.queryprocessor.QueryProcessorFactory;
 import tech.thedumbdev.reader.Reader;
 import tech.thedumbdev.reader.ReaderFactory;
-import tech.thedumbdev.util.ElasticPathCheck;
 
 import java.util.*;
 
@@ -39,9 +38,6 @@ public class App {
                 String host = sc.nextLine();
                 System.out.println("Enter the API key: ");
                 String apiKey = sc.nextLine();
-                if(!ElasticPathCheck.validConnectionString(host) || !ElasticPathCheck.validAPIKey(apiKey)) {
-                    throw new IllegalArgumentException("Invalid host url or API key");
-                }
                 yield new ArrayList<>(Arrays.asList(host, apiKey));
             }
             case "file" -> {
@@ -71,19 +67,6 @@ public class App {
                     break;
                 default:
                     try {
-//                        String[] testQueries = {
-//                                "SELECT name FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
-//                                "SELECT name, email FROM 1234567890.log BETWEEN 1234567890 AND 1234567890;",
-//                                "FIND name IN 1234567890.log;",
-//                                "FIND name, email IN 1234567890.log;",
-//                        };
-
-//                        for (String testQuery : testQueries) {
-//                            System.out.println("Query: " + testQuery);
-//                            System.out.println("Tree: " + treeGenerator(testQuery));
-//                            System.out.println("Done!!!");
-//                        }
-
                         ParseTree tree = treeGenerator(query);
                         ASTBuilder visitor = new ASTBuilder();
                         ASTQuery astQuery = visitor.visit(tree);
